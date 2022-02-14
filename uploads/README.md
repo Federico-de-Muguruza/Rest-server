@@ -1,0 +1,1 @@
+#Aquí se guardarán las imágenes de los productos y de los usuarios

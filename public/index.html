@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+</head>
+<body>
+    
+    <div id="g_id_onload"
+        data-client_id="987438756652-nf6cpk6jv1mnah02rph1e4eglh0416u7.apps.googleusercontent.com"
+        data-auto_prompt="false"
+        data-callback="handleCredentialResponse">
+    </div>
+    <div class="g_id_signin"
+        data-type="standard"
+        data-size="large"
+        data-theme="outline"
+        data-text="sign_in_with"
+        data-shape="rectangular"
+        data-logo_alignment="left">
+    </div>
+    <button id="sign_out">Cerrar sesión</button>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script>
+        async function handleCredentialResponse(response) {
+            const url = (window.location.hostname.includes('localhost')
+            ? 'http://localhost:8080/api/auth/google'
+            : 'https://muguckz-rest-server.herokuapp.com/api/auth/google');
+
+            const body = {
+                id_token: response.credential
+            };
+
+            try {
+                const resp = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                const data = await resp.json();
+                console.log(data);
+                localStorage.setItem('email', data.user.email);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        document.querySelector("#sign_out").addEventListener("click", () => {
+            google.accounts.id.revoke(localStorage.getItem('email'), done => {
+                localStorage.clear();
+                location.reload();
+            });
+        });
+    </script>
+</body>
+</html>
